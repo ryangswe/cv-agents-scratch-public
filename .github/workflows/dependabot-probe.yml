@@ -1,0 +1,15 @@
+# Never runs on its own. It pins an old action so Dependabot opens a dependabot/** branch, which
+# the other-branches ruleset must still allow.
+name: dependabot-probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3

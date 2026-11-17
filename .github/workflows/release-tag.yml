@@ -1,0 +1,22 @@
+# Stands in for release-on-merge tagging with GITHUB_TOKEN. The tags ruleset lets GitHub Actions
+# through, and phase 1 checks that a merge by the owner still gets its tag.
+name: release-tag
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    # Not on the setup's first push, which comes before the rulesets exist.
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          tag="v0.1.${GITHUB_RUN_NUMBER}"
+          git tag "$tag"
+          git push --quiet origin "$tag"

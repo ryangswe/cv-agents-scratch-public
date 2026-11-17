@@ -1,0 +1,36 @@
+# The required check is the `test` job, pinned to GitHub Actions in the default-checks ruleset.
+# `env-probe` asks for the `canary` environment, whose branch policy allows only main, so it must
+# fail on agent/** pushes and on PRs and pass on main, including the scheduled run, which GitHub
+# starts from main.
+name: ci
+
+on:
+  push:
+    branches: [main, "agent/**"]
+  pull_request:
+  schedule:
+    - cron: "17 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: ./scripts/test.sh
+        env:
+          CANARY_REPO: ${{ secrets.CANARY_REPO }}
+
+  env-probe:
+    runs-on: ubuntu-latest
+    environment: canary
+    steps:
+      - run: |
+          if [ -n "$CANARY_ENV" ]; then echo "environment canary: present"; else echo "environment canary: absent"; fi
+        env:
+          CANARY_ENV: ${{ secrets.CANARY_ENV }}

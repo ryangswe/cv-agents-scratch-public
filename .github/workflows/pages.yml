@@ -1,0 +1,33 @@
+# Stands in for a repo's own deploy to gh-pages with GITHUB_TOKEN. The other-branches ruleset lets
+# GitHub Actions through, and phase 1 checks that this still works after the owner merges.
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    # Not on the setup's first push, which comes before the rulesets exist.
+    if: github.event.before != '0000000000000000000000000000000000000000'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git fetch --quiet origin gh-pages; then
+            git checkout --quiet -B gh-pages FETCH_HEAD
+          else
+            git checkout --quiet --orphan gh-pages
+            git rm -r --quiet --cached .
+            find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          fi
+          date -u > index.html
+          git add index.html
+          git commit --quiet -m "pages: ${GITHUB_SHA}"
+          git push --quiet origin gh-pages
