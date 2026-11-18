@@ -1,3 +1,4 @@
+# Phase 1 checks that Dependabot can still open its dependabot/** branch under the rulesets.
 version: 2
 updates:
   - package-ecosystem: github-actions

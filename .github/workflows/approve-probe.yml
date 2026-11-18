@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - run: gh pr review "$PR" --approve --body "approve-probe: GITHUB_TOKEN tries to approve" -R "$REPO"
+      - run: |
+          gh pr review "$PR" --approve --body "approve-probe: GITHUB_TOKEN tries to approve" -R "$REPO"
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
