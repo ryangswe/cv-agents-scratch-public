@@ -1,10 +1,8 @@
 #!/bin/sh
-# The scratch repo's "tests", run by the `test` job, which is the required check. A PR may edit
-# this file; the phase 1 test checks what such an edit can reach from inside CI.
+# Phase 1, PR C: what an edit to the script CI runs can reach. It prints names, never values.
 set -eu
-if [ -n "${CANARY_REPO:-}" ]; then
-  echo "repo canary: present"
-else
-  echo "repo canary: absent"
-fi
-echo "tests passed"
+if [ -n "${CANARY_REPO:-}" ]; then echo "repo canary: present"; else echo "repo canary: absent"; fi
+echo "credential-like variables: $(env | cut -d= -f1 | grep -E 'TOKEN|SECRET|KEY|CANARY|PASSWORD|ACTIONS_' | sort | tr '\n' ' ')"
+if git config --get-regexp 'http\..*extraheader' >/dev/null 2>&1; then echo "git credentials: present"; else echo "git credentials: absent"; fi
+echo "tests fail on purpose"
+exit 1
