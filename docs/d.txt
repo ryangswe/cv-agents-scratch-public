@@ -1,0 +1,1 @@
+PR D: no CI result; tests the required check's pin.
